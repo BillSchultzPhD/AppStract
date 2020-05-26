@@ -109,6 +109,11 @@ abstext <- internal_links %>%
   
   unlist()
 
+#fixing up the results
+titles <- trimws(titles)
+abstext <- gsub("Abstract","",abstext, ignore.case = FALSE)
+abstext <- trimws(abstext)
+
 out <- cbind(titles,abstext)
 write.xlsx(out,
            "AppStract Output.xlsx",
@@ -154,6 +159,11 @@ abstext <- internal_links %>%
   }) %>% 
   
   unlist()
+
+#fixing up the results
+titles <- gsub("\n","",titles)
+titles <- trimws(titles)
+abstext <- gsub("Abstract","",abstext, ignore.case = FALSE)
 
 out <- cbind(titles,abstext)
 write.xlsx(out,
