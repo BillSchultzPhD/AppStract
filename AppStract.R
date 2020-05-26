@@ -109,11 +109,56 @@ abstext <- internal_links %>%
   
   unlist()
 
-# initial output
 out <- cbind(titles,abstext)
 write.xlsx(out,
            "AppStract Output.xlsx",
            sheetName = "AJPS",
+           append=TRUE)
+
+#######
+####### JOP (Appended onto initial)
+#######
+
+# setup
+latest_issue_url <- "https://www.journals.uchicago.edu/toc/jop/current"
+article_url <- "https://www.journals.uchicago.edu/doi/abs/"
+
+internal_links <- Rcrawler::LinkExtractor(url = latest_issue_url)$InternalLinks
+
+# select only articles and not other internal links on page
+# no extra exlucsions needed for JOP
+internal_links <- internal_links[grepl(article_url, internal_links)]
+
+# titles
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's title
+titles <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".publicationContentTitle"))
+    
+  }) %>% 
+  
+  unlist()
+
+# abstracts
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's abstract
+abstext <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".hlFld-Abstract"))
+    
+  }) %>% 
+  
+  unlist()
+
+out <- cbind(titles,abstext)
+write.xlsx(out,
+           "AppStract Output.xlsx",
+           sheetName = "JOP",
            append=TRUE)
 
 #######
