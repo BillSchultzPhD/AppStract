@@ -1,0 +1,208 @@
+---
+title: "AppStract"
+author: "Bill Schultz"
+date: "May 26, 2020"
+output:
+  html_document:
+    toc: true
+    theme: readable
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+``` {r packages, include = FALSE }
+
+#install.packages("Rcrawler")
+library(Rcrawler)
+#install.packages("tidyverse)
+library(tidyverse)
+
+```
+
+# Most recent APSR (as of document date)
+
+``` {r AppStract_APSR, include=FALSE}
+
+#######
+####### APSR 
+#######
+  
+# setup
+latest_issue_url <- "https://www.cambridge.org/core/journals/american-political-science-review/latest-issue"
+article_url <- "https://www.cambridge.org/core/journals/american-political-science-review/article/"
+
+internal_links <- Rcrawler::LinkExtractor(url = latest_issue_url)$InternalLinks
+
+# select only articles and not other internal links on page
+internal_links <- internal_links[grepl(article_url, internal_links)]
+
+# get rid of things that aren't research articles
+# number of exclusions needed here may vary depending on journal
+internal_links <- internal_links[!(grepl("notes-from-the-editors", internal_links ))]
+
+# titles
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's title
+titles <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".article-title"))
+    
+  }) %>% 
+  
+  unlist()
+
+# abstracts
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's abstract
+abstext <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".abstract"))
+    
+  }) %>% 
+  
+  unlist()
+
+out <- cbind(titles, abstext)
+colnames(out) <- c("Article Title",
+                "Article Abstract")
+
+```
+
+``` {r APSR_kable, results = 'asis', echo=FALSE}
+
+kable(out, caption = "American Political Science Review")
+
+```
+
+
+# Most recent AJPS (as of document date)
+
+``` {r AppStract_AJPS, include=FALSE}
+
+#######
+####### AJPS
+#######
+
+# setup
+latest_issue_url <- "https://onlinelibrary.wiley.com/toc/15405907/current"
+article_url <- "https://onlinelibrary.wiley.com/doi/abs/"
+
+internal_links <- Rcrawler::LinkExtractor(url = latest_issue_url)$InternalLinks
+
+# select only articles and not other internal links on page
+# no extra exlucsions needed for AJPS
+internal_links <- internal_links[grepl(article_url, internal_links)]
+
+# titles
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's title
+titles <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".citation__title"))
+    
+  }) %>% 
+  
+  unlist()
+
+# abstracts
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's abstract
+abstext <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".abstract-group"))
+    
+  }) %>% 
+  
+  unlist()
+
+#fixing up the results
+titles <- trimws(titles)
+abstext <- gsub("Abstract","",abstext, ignore.case = FALSE)
+abstext <- trimws(abstext)
+
+out <- cbind(titles, abstext)
+colnames(out) <- c("Article Title",
+                "Article Abstract")
+
+```
+
+``` {r AJPS_kable, results = 'asis', echo=FALSE}
+
+kable(out, caption = "American Journal of Political Science")
+
+```
+
+# Most recent JOP (as of document date)
+
+``` {r AppStract_JOP, include=FALSE}
+
+#######
+####### JOP 
+#######
+
+# setup
+latest_issue_url <- "https://www.journals.uchicago.edu/toc/jop/current"
+article_url <- "https://www.journals.uchicago.edu/doi/abs/"
+
+internal_links <- Rcrawler::LinkExtractor(url = latest_issue_url)$InternalLinks
+
+# select only articles and not other internal links on page
+# no extra exlucsions needed for JOP
+internal_links <- internal_links[grepl(article_url, internal_links)]
+
+# titles
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's title
+titles <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".publicationContentTitle"))
+    
+  }) %>% 
+  
+  unlist()
+
+# abstracts
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's abstract
+abstext <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".hlFld-Abstract"))
+    
+  }) %>% 
+  
+  unlist()
+
+#fixing up the results
+titles <- gsub("\n","",titles)
+titles <- trimws(titles)
+abstext <- gsub("Abstract","",abstext, ignore.case = FALSE)
+
+out <- cbind(titles, abstext)
+colnames(out) <- c("Article Title",
+                "Article Abstract")
+
+
+```
+
+``` {r JOP_kable, results = 'asis'}
+
+kable(out, caption = "Journal of Politics")
+
+```
+
