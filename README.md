@@ -3,4 +3,4 @@ Some R markdown code to webscrape article titles and abstracts from the most rec
 
 This script currently compiles titles and abstracts (with a bit of messy formatting in some cases) for the 3 top Political Science journals. The code runs a bit slow, each journal will take two minutes or so. If you have any suggestions on journals to include, let me know. You should be able to use the existing examples to add other journals yourself. I'll expand the list over time.
 
-An example of the output is [here](https://billschultzphd.netlify.app/md/AppStract.html).
+An example of the output is [here](https://billschultzphd.netlify.app/md/AppStract.html). Keep in mind that this is still a work in process, the results could still use a little fine tuning.
