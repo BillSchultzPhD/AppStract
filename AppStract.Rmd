@@ -200,7 +200,7 @@ colnames(out) <- c("Article Title",
 
 ```
 
-``` {r JOP_kable, results = 'asis'}
+``` {r JOP_kable, results = 'asis', echo = FALSE}
 
 kable(out, caption = "Journal of Politics")
 
