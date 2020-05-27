@@ -75,6 +75,7 @@ colnames(out) <- c("Article Title",
                 "Article Abstract")
 
 out <- out[!(is.na(out[,2])),]
+out <- out[!(out[,2]==""),]
 
 ```
 
@@ -139,6 +140,7 @@ colnames(out) <- c("Article Title",
                 "Article Abstract")
 
 out <- out[!(is.na(out[,2])),]
+out <- out[!(out[,2]==""),]
 
 ```
 
@@ -205,6 +207,7 @@ colnames(out) <- c("Article Title",
                 "Article Abstract")
 
 out <- out[!(is.na(out[,2])),]
+out <- out[!(out[,2]==""),]
 
 ```
 
