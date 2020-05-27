@@ -130,6 +130,9 @@ abstext <- internal_links %>%
 #fixing up the results
 titles <- trimws(titles)
 abstext <- gsub("Abstract","",abstext, ignore.case = FALSE)
+titles <- gsub("Review Essay","",titles, ignore.case=FALSE)
+titles <- gsub("Scholarly Dialogue","",titles, ignore.case=FALSE)
+titles <- gsub("Short Article","",titles, ignore.case=FALSE)
 abstext <- trimws(abstext)
 
 out <- cbind(titles, abstext)
