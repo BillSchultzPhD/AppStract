@@ -74,6 +74,8 @@ out <- cbind(titles, abstext)
 colnames(out) <- c("Article Title",
                 "Article Abstract")
 
+out <- out[!(is.na(out[,2])),]
+
 ```
 
 ``` {r APSR_kable, results = 'asis', echo=FALSE}
@@ -130,14 +132,13 @@ abstext <- internal_links %>%
 #fixing up the results
 titles <- trimws(titles)
 abstext <- gsub("Abstract","",abstext, ignore.case = FALSE)
-titles <- gsub("Review Essay","",titles, ignore.case=FALSE)
-titles <- gsub("Scholarly Dialogue","",titles, ignore.case=FALSE)
-titles <- gsub("Short Article","",titles, ignore.case=FALSE)
 abstext <- trimws(abstext)
 
 out <- cbind(titles, abstext)
 colnames(out) <- c("Article Title",
                 "Article Abstract")
+
+out <- out[!(is.na(out[,2])),]
 
 ```
 
@@ -195,11 +196,15 @@ abstext <- internal_links %>%
 titles <- gsub("\n","",titles)
 titles <- trimws(titles)
 abstext <- gsub("Abstract","",abstext, ignore.case = FALSE)
+titles <- gsub("Review Essay","",titles, ignore.case=FALSE)
+titles <- gsub("Scholarly Dialogue","",titles, ignore.case=FALSE)
+titles <- gsub("Short Article","",titles, ignore.case=FALSE)
 
 out <- cbind(titles, abstext)
 colnames(out) <- c("Article Title",
                 "Article Abstract")
 
+out <- out[!(is.na(out[,2])),]
 
 ```
 
