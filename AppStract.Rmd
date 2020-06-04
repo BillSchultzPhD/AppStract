@@ -217,3 +217,182 @@ kable(out, caption = "Journal of Politics")
 
 ```
 
+# Most recent IO (as of document date)
+
+``` {r AppStract_IO, include=FALSE}
+
+#######
+####### IO
+#######
+
+# setup
+latest_issue_url <- "https://www.cambridge.org/core/journals/international-organization/latest-issue"
+article_url <- "https://www.cambridge.org/core/journals/international-organization/article/"
+
+internal_links <- Rcrawler::LinkExtractor(url = latest_issue_url)$InternalLinks
+
+# select only articles and not other internal links on page
+# no extra exlucsions needed for IO
+internal_links <- internal_links[grepl(article_url, internal_links)]
+
+# titles
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's title
+titles <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".article-title"))
+    
+  }) %>% 
+  
+  unlist()
+
+# abstracts
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's abstract
+abstext <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".abstract"))
+    
+  }) %>% 
+  
+  unlist()
+
+#fixing up the results
+out <- cbind(titles, abstext)
+colnames(out) <- c("Article Title",
+                "Article Abstract")
+
+out <- out[!(is.na(out[,2])),]
+out <- out[!(out[,2]==""),]
+
+```
+
+``` {r JOP_IO, results = 'asis', echo = FALSE}
+
+kable(out, caption = "International Organization")
+
+```
+
+# Most recent WP (as of document date)
+
+``` {r AppStract_WP, include=FALSE}
+
+#######
+####### WP
+#######
+
+# setup
+latest_issue_url <- "https://www.cambridge.org/core/journals/world-politics/latest-issue"
+article_url <- "https://www.cambridge.org/core/journals/world-politics/article/"
+
+internal_links <- Rcrawler::LinkExtractor(url = latest_issue_url)$InternalLinks
+
+# select only articles and not other internal links on page
+# no extra exlucsions needed for WP
+internal_links <- internal_links[grepl(article_url, internal_links)]
+
+# titles
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's title
+titles <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".article-title"))
+    
+  }) %>% 
+  
+  unlist()
+
+# abstracts
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's abstract
+abstext <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".abstract"))
+    
+  }) %>% 
+  
+  unlist()
+
+#fixing up the results
+out <- cbind(titles, abstext)
+colnames(out) <- c("Article Title",
+                "Article Abstract")
+
+out <- out[!(is.na(out[,2])),]
+out <- out[!(out[,2]==""),]
+
+```
+
+``` {r JOP_WP, results = 'asis', echo = FALSE}
+
+kable(out, caption = "World Politics")
+
+```
+
+# Most recent PA (as of document date)
+
+``` {r AppStract_PA, include=FALSE}
+
+#######
+####### PA
+#######
+
+# setup
+latest_issue_url <- "https://www.cambridge.org/core/journals/political-analysis/latest-issue"
+article_url <- "https://www.cambridge.org/core/journals/political-analysis/article/"
+
+internal_links <- Rcrawler::LinkExtractor(url = latest_issue_url)$InternalLinks
+
+# select only articles and not other internal links on page
+# no extra exlucsions needed for PA
+internal_links <- internal_links[grepl(article_url, internal_links)]
+
+# titles
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's title
+titles <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".article-title"))
+    
+  }) %>% 
+  
+  unlist()
+
+# abstracts
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's abstract
+abstext <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".abstract"))
+    
+  }) %>% 
+  
+  unlist()
+
+#fixing up the results
+out <- cbind(titles, abstext)
+colnames(out) <- c("Article Title",
+                "Article Abstract")
+
+out <- out[!(is.na(out[,2])),]
+out <- out[!(out[,2]==""),]
+
+```
+
+``` {r JOP_PA, results = 'asis', echo = FALSE}
+
+kable(out, caption = "Political Analysis")
+
+```
