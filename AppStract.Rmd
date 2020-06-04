@@ -1,7 +1,7 @@
 ---
 title: "AppStract"
 author: "Bill Schultz"
-date: "May 26, 2020"
+date: "June 4, 2020"
 output:
   html_document:
     toc: true
@@ -334,6 +334,64 @@ out <- out[!(out[,2]==""),]
 ``` {r JOP_WP, results = 'asis', echo = FALSE}
 
 kable(out, caption = "World Politics")
+
+```
+
+# Most recent WP (as of document date)
+
+``` {r AppStract_CPS, include=FALSE}
+
+#######
+####### CPS
+#######
+
+# setup
+latest_issue_url <- "https://journals.sagepub.com/toc/CPS/current"
+article_url <- "https://journals.sagepub.com/doi/full/10.1177/"
+
+internal_links <- Rcrawler::LinkExtractor(url = latest_issue_url)$InternalLinks
+
+# select only articles and not other internal links on page
+# no extra exlucsions needed for CPS
+internal_links <- internal_links[grepl(article_url, internal_links)]
+
+# titles
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's title
+titles <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".art_title"))
+    
+  }) %>% 
+  
+  unlist()
+
+# abstracts
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's abstract
+abstext <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".hlFld-Abstract"))
+    
+  }) %>% 
+  
+  unlist()
+
+#fixing up the results
+abstext <- gsub("Abstract","",abstext)
+out <- cbind(titles, abstext)
+colnames(out) <- c("Article Title",
+                "Article Abstract")
+
+```
+
+``` {r JOP_CPS, results = 'asis', echo = FALSE}
+
+kable(out, caption = "Comparative Political Studies")
 
 ```
 
