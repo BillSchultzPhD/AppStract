@@ -337,7 +337,7 @@ kable(out, caption = "World Politics")
 
 ```
 
-# Most recent WP (as of document date)
+# Most recent CPS (as of document date)
 
 ``` {r AppStract_CPS, include=FALSE}
 
