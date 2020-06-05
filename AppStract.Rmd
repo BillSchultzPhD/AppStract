@@ -454,3 +454,63 @@ out <- out[!(out[,2]==""),]
 kable(out, caption = "Political Analysis")
 
 ```
+
+# Most recent JTP (as of document date)
+
+``` {r AppStract_JTP, include=FALSE}
+
+#######
+####### JTP
+#######
+
+# setup
+latest_issue_url <- "https://journals.sagepub.com/toc/JTP/current"
+article_url <- "https://journals.sagepub.com/doi/full/10.1177/"
+
+internal_links <- Rcrawler::LinkExtractor(url = latest_issue_url)$InternalLinks
+
+# select only articles and not other internal links on page
+# no extra exlucsions needed for PA
+internal_links <- internal_links[grepl(article_url, internal_links)]
+
+# titles
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's title
+titles <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".art_title"))
+    
+  }) %>% 
+  
+  unlist()
+
+# abstracts
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's abstract
+abstext <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".abstractSection.abstractInFull"))
+    
+  }) %>% 
+  
+  unlist()
+
+#fixing up the results
+out <- cbind(titles, abstext)
+colnames(out) <- c("Article Title",
+                "Article Abstract")
+
+out <- out[!(is.na(out[,2])),]
+out <- out[!(out[,2]==""),]
+
+```
+
+``` {r JTP_kable, results = 'asis', echo = FALSE}
+
+kable(out, caption = "Journal of Theoretical Politics")
+
+```
