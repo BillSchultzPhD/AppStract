@@ -1,0 +1,704 @@
+---
+title: "AppStract - Conservation and Development"
+author: "Bill Schultz"
+date: "September 1 2020"
+output:
+  html_document:
+    toc: true
+    theme: readable
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+``` {r packages, include = FALSE }
+  
+  #install.packages("Rcrawler")
+  library(Rcrawler)
+  #install.packages("tidyverse")
+  library(tidyverse)
+
+```
+
+# Most recent GEP (as of document date)
+
+``` {r AppStract_GEP, include=FALSE}
+
+#######
+####### GEP
+#######
+  
+# setup
+latest_issue_url <- "https://www.mitpressjournals.org/toc/glep/current"
+article_url <- "https://www.mitpressjournals.org/doi/abs/10.1162/"
+
+internal_links <- Rcrawler::LinkExtractor(url = latest_issue_url)$InternalLinks
+
+# select only articles and not other internal links on page
+internal_links <- internal_links[grepl(article_url, internal_links)]
+
+# get rid of things that aren't research articles
+# number of exclusions needed here may vary depending on journal
+internal_links <- internal_links[!(grepl("notes-from-the-editors", internal_links ))]
+
+# titles
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's title
+titles <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".chaptertitle"))
+    
+  }) %>% 
+  
+  unlist()
+
+# abstracts
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's abstract
+abstext <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".abstractSection.abstractInFull"))
+    
+  }) %>% 
+  
+  unlist()
+
+titles <- gsub("\n","",titles)
+titles <- base::trimws(titles)
+
+abstext <- gsub("Abstract","",abstext)
+abstext <- gsub("Section:ChooseTop of page <<","",abstext)
+abstext <- base::trimws(abstext)
+
+out <- cbind(titles, abstext)
+colnames(out) <- c("Article Title",
+                "Article Abstract")
+
+out <- out[!(is.na(out[,2])),]
+out <- out[!(out[,2]==""),]
+
+```
+
+``` {r GEP_kable, results = 'asis', echo=FALSE}
+
+kable(out, caption = "Global Environmental Politics")
+
+```
+
+
+# Most recent WD (as of document date)
+
+``` {r AppStract_WD, include=FALSE}
+
+#######
+####### WD
+#######
+
+# setup
+# this one was annoying
+base_url <- "https://www.sciencedirect.com/journal/world-development/issues"
+alllinks <- Rcrawler::LinkExtractor(url = base_url)$InternalLinks
+alllinks <- alllinks[grepl("https://www.sciencedirect.com/journal/world-development/vol/",alllinks)]
+alllinks <- gsub("https://www.sciencedirect.com/journal/world-development/vol/",
+                 "",
+                 alllinks)
+alllinks <- gsub("/suppl/C",
+                 "",
+                 alllinks)
+latest_issue_url <- paste("https://www.sciencedirect.com/journal/world-development/vol/",
+                          sort(as.numeric(alllinks),decreasing = TRUE)[1],
+                          "/suppl/C", 
+                          sep="")
+article_url <- "https://www.sciencedirect.com/science/article/pii/"
+
+internal_links <- Rcrawler::LinkExtractor(url = latest_issue_url)$InternalLinks
+
+# select only articles and not other internal links on page
+# no extra exlucsions needed for AJPS
+internal_links <- internal_links[grepl(article_url, internal_links)]
+
+# titles
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's title
+titles <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".title-text"))
+    
+  }) %>% 
+  
+  unlist()
+
+# abstracts
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's abstract
+abstext <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = "#sp0010"))
+    
+  }) %>% 
+  
+  unlist()
+
+#fixing up the results
+out <- cbind(titles, abstext)
+colnames(out) <- c("Article Title",
+                "Article Abstract")
+
+out <- out[!(is.na(out[,2])),]
+out <- out[!(out[,2]==""),]
+
+```
+
+``` {r WD_kable, results = 'asis', echo=FALSE}
+
+kable(out, caption = "World Development")
+
+```
+
+# Most recent JPAM (as of document date)
+
+``` {r AppStract_JPAM, include=FALSE}
+
+#######
+####### JPAM
+#######
+
+# setup
+latest_issue_url <- "https://onlinelibrary.wiley.com/toc/15206688/current"
+article_url <- "https://onlinelibrary.wiley.com/doi/10.1002/"
+
+internal_links <- Rcrawler::LinkExtractor(url = latest_issue_url)$InternalLinks
+
+# select only articles and not other internal links on page
+# no extra exlucsions needed for JPAM
+internal_links <- internal_links[grepl(article_url, internal_links)]
+
+# titles
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's title
+titles <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".citation__title"))
+    
+  }) %>% 
+  
+  unlist()
+
+# abstracts
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's abstract
+abstext <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".abstract-group"))
+    
+  }) %>% 
+  
+  unlist()
+
+#fixing up the results
+abstext <- gsub("Abstract","",abstext, ignore.case = FALSE)
+abstext <- trimws(abstext)
+
+out <- cbind(titles, abstext)
+colnames(out) <- c("Article Title",
+                "Article Abstract")
+
+out <- out[!(is.na(out[,2])),]
+out <- out[!(out[,2]==""),]
+
+```
+
+``` {r JPAM_kable, results = 'asis', echo = FALSE}
+
+kable(out, caption = "Journal of Policy Analysis and Management")
+
+```
+
+# Most recent CL (as of document date)
+
+``` {r AppStract_CL, include=FALSE}
+
+#######
+####### CL
+#######
+
+# setup
+latest_issue_url <- "https://conbio.onlinelibrary.wiley.com/toc/1755263x/current"
+article_url <- "https://conbio.onlinelibrary.wiley.com/doi/10.1111/"
+
+internal_links <- Rcrawler::LinkExtractor(url = latest_issue_url)$InternalLinks
+
+# select only articles and not other internal links on page
+# no extra exlucsions needed for CL
+internal_links <- internal_links[grepl(article_url, internal_links)]
+
+# titles
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's title
+titles <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".citation__title"))
+    
+  }) %>% 
+  
+  unlist()
+
+# abstracts
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's abstract
+abstext <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".abstract-group"))
+    
+  }) %>% 
+  
+  unlist()
+
+#fixing up the results
+abstext <- gsub("Abstract","",abstext, ignore.case = FALSE)
+abstext <- trimws(abstext)
+
+out <- cbind(titles, abstext)
+colnames(out) <- c("Article Title",
+                "Article Abstract")
+
+out <- out[!(is.na(out[,2])),]
+out <- out[!(out[,2]==""),]
+
+```
+
+``` {r JOP_CL, results = 'asis', echo = FALSE}
+
+kable(out, caption = "Conservation Letters")
+
+```
+
+# Most recent JEEM (as of document date)
+
+``` {r AppStract_JEEM, include=FALSE}
+
+#######
+####### JEEM
+#######
+
+# setup
+# this one was annoying
+base_url <- "https://www.sciencedirect.com/journal/journal-of-environmental-economics-and-management/issues"
+alllinks <- Rcrawler::LinkExtractor(url = base_url)$InternalLinks
+alllinks <- alllinks[grepl("https://www.sciencedirect.com/journal/journal-of-environmental-economics-and-management/vol/",alllinks)]
+alllinks <- gsub("https://www.sciencedirect.com/journal/journal-of-environmental-economics-and-management/vol/",
+                 "",
+                 alllinks)
+alllinks <- gsub("/suppl/C",
+                 "",
+                 alllinks)
+latest_issue_url <- paste("https://www.sciencedirect.com/journal/journal-of-environmental-economics-and-management/vol/",
+                          sort(as.numeric(alllinks),decreasing = TRUE)[1],
+                          "/suppl/C", 
+                          sep="")
+article_url <- "https://www.sciencedirect.com/science/article/pii/"
+
+internal_links <- Rcrawler::LinkExtractor(url = latest_issue_url)$InternalLinks
+
+# select only articles and not other internal links on page
+# no extra exlucsions needed for AJPS
+internal_links <- internal_links[grepl(article_url, internal_links)]
+
+# titles
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's title
+titles <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".title-text"))
+    
+  }) %>% 
+  
+  unlist()
+
+# abstracts
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's abstract
+abstext <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = "#abspara0010"))
+    
+  }) %>% 
+  
+  unlist()
+
+#fixing up the results
+out <- cbind(titles, abstext)
+colnames(out) <- c("Article Title",
+                "Article Abstract")
+
+out <- out[!(is.na(out[,2])),]
+out <- out[!(out[,2]==""),]
+
+```
+
+``` {r JEEM_kable, results = 'asis', echo = FALSE}
+
+kable(out, caption = "Journal of Environmental Economics and Management")
+
+```
+
+# Most recent CB (as of document date)
+
+``` {r AppStract_CB, include=FALSE}
+
+#######
+####### CB
+#######
+
+# setup
+latest_issue_url <- "https://conbio.onlinelibrary.wiley.com/toc/15231739/current"
+article_url <- "https://conbio.onlinelibrary.wiley.com/doi/10.1111/"
+
+internal_links <- Rcrawler::LinkExtractor(url = latest_issue_url)$InternalLinks
+
+# select only articles and not other internal links on page
+# no extra exlucsions needed for CB
+internal_links <- internal_links[grepl(article_url, internal_links)]
+
+# titles
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's title
+titles <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".citation__title"))
+    
+  }) %>% 
+  
+  unlist()
+
+# abstracts
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's abstract
+abstext <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".article-section__content.en.main"))
+    
+  }) %>% 
+  
+  unlist()
+
+#fixing up the results
+abstext <- gsub("\n","",abstext, ignore.case = FALSE)
+abstext <- trimws(abstext)
+
+out <- cbind(titles, abstext)
+colnames(out) <- c("Article Title",
+                "Article Abstract")
+
+out <- out[!(is.na(out[,2])),]
+out <- out[!(out[,2]==""),]
+
+```
+
+``` {r CB_kable, results = 'asis', echo = FALSE}
+
+kable(out, caption = "Conservation Biology")
+
+```
+
+# Most recent ESP (as of document date)
+
+``` {r AppStract_ESP, include=FALSE}
+
+#######
+####### ESP
+#######
+
+# setup
+# this one was annoying
+base_url <- "https://www.sciencedirect.com/journal/environmental-science-and-policy/issues"
+alllinks <- Rcrawler::LinkExtractor(url = base_url)$InternalLinks
+alllinks <- alllinks[grepl("https://www.sciencedirect.com/journal/environmental-science-and-policy/vol/",alllinks)]
+alllinks <- gsub("https://www.sciencedirect.com/journal/environmental-science-and-policy/vol/",
+                 "",
+                 alllinks)
+alllinks <- gsub("/suppl/C",
+                 "",
+                 alllinks)
+latest_issue_url <- paste("https://www.sciencedirect.com/journal/environmental-science-and-policy/vol/",
+                          sort(as.numeric(alllinks),decreasing = TRUE)[1],
+                          "/suppl/C", 
+                          sep="")
+article_url <- "https://www.sciencedirect.com/science/article/pii/"
+
+internal_links <- Rcrawler::LinkExtractor(url = latest_issue_url)$InternalLinks
+
+# select only articles and not other internal links on page
+# no extra exlucsions needed for AJPS
+internal_links <- internal_links[grepl(article_url, internal_links)]
+
+# titles
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's title
+titles <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".title-text"))
+    
+  }) %>% 
+  
+  unlist()
+
+# abstracts
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's abstract
+abstext <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = "#abst0010"))
+    
+  }) %>% 
+  
+  unlist()
+
+#fixing up the results
+out <- cbind(titles, abstext)
+colnames(out) <- c("Article Title",
+                "Article Abstract")
+
+out <- out[!(is.na(out[,2])),]
+out <- out[!(out[,2]==""),]
+
+```
+
+``` {r ESP_kable, results = 'asis', echo = FALSE}
+
+kable(out, caption = "Environmental Science and Policy")
+
+```
+
+# Most recent EE (as of document date)
+
+``` {r AppStract_EE, include=FALSE}
+
+#######
+####### EE
+#######
+
+# setup
+# this one was annoying
+base_url <- "https://www.sciencedirect.com/journal/ecological-economics/issues"
+alllinks <- Rcrawler::LinkExtractor(url = base_url)$InternalLinks
+alllinks <- alllinks[grepl("https://www.sciencedirect.com/journal/ecological-economics/vol/",alllinks)]
+alllinks <- gsub("https://www.sciencedirect.com/journal/ecological-economics/vol/",
+                 "",
+                 alllinks)
+alllinks <- gsub("/suppl/C",
+                 "",
+                 alllinks)
+latest_issue_url <- paste("https://www.sciencedirect.com/journal/ecological-economics/vol/",
+                          sort(as.numeric(alllinks),decreasing = TRUE)[1],
+                          "/suppl/C", 
+                          sep="")
+article_url <- "https://www.sciencedirect.com/science/article/pii/"
+
+internal_links <- Rcrawler::LinkExtractor(url = latest_issue_url)$InternalLinks
+
+# select only articles and not other internal links on page
+# no extra exlucsions needed for AJPS
+internal_links <- internal_links[grepl(article_url, internal_links)]
+
+# titles
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's title
+titles <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".title-text"))
+    
+  }) %>% 
+  
+  unlist()
+
+# abstracts
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's abstract
+abstext <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = "#as0005"))
+    
+  }) %>% 
+  
+  unlist()
+
+#fixing up the results
+out <- cbind(titles, abstext)
+colnames(out) <- c("Article Title",
+                "Article Abstract")
+
+out <- out[!(is.na(out[,2])),]
+out <- out[!(out[,2]==""),]
+
+```
+
+``` {r EE_kable, results = 'asis', echo = FALSE}
+
+kable(out, caption = "Ecological Economics")
+
+```
+
+# Most recent JPR (as of document date)
+
+``` {r AppStract_JPR, include=FALSE}
+
+#######
+####### JPR
+#######
+
+# setup
+latest_issue_url <- "https://journals.sagepub.com/toc/JPR/current"
+article_url <- "https://journals.sagepub.com/doi/full/10.1177/"
+
+internal_links <- Rcrawler::LinkExtractor(url = latest_issue_url)$InternalLinks
+
+# select only articles and not other internal links on page
+# no extra exlucsions needed for JPR
+internal_links <- internal_links[grepl(article_url, internal_links)]
+
+# titles
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's title
+titles <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".art_title"))
+    
+  }) %>% 
+  
+  unlist()
+
+# abstracts
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's abstract
+abstext <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".hlFld-Abstract"))
+    
+  }) %>% 
+  
+  unlist()
+
+#fixing up the results
+abstext <- gsub("Abstract","",abstext, ignore.case = FALSE)
+abstext <- trimws(abstext)
+
+out <- cbind(titles, abstext)
+colnames(out) <- c("Article Title",
+                "Article Abstract")
+
+out <- out[!(is.na(out[,2])),]
+out <- out[!(out[,2]==""),]
+
+```
+
+``` {r JPR_kable, results = 'asis', echo = FALSE}
+
+kable(out, caption = "Journal of Peace Research")
+
+```
+
+# Most recent AER (as of document date)
+
+``` {r AppStract_AER, include=FALSE}
+
+#######
+####### AER
+#######
+
+# setup
+latest_issue_url <- "https://www.aeaweb.org/journals/aer/search-results?ArticleSearch%5Bcurrent%5D=1&JelClass%5Bvalue%5D=0&journal=1&ArticleSearch%5Bq%5D="
+article_url <- "https://www.aeaweb.org/articles"
+
+internal_links <- Rcrawler::LinkExtractor(url = latest_issue_url)$InternalLinks
+
+# select only articles and not other internal links on page
+# no extra exlucsions needed for AER
+internal_links <- internal_links[grepl(article_url, internal_links)]
+
+# titles
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's title
+titles <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".title"))
+    
+  }) %>% 
+  
+  unlist()
+
+# abstracts
+# use "inspect source" on one of the article pages to find a useful "class"
+# in the HTML code that stores the article's abstract
+abstext <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist(ContentScraper(Url = .x, CssPatterns = ".article-information.abstract"))
+    
+  }) %>% 
+  
+  unlist()
+
+#fixing up the results
+abstext <- gsub("Abstract","",abstext, ignore.case = FALSE)
+abstext <- gsub("\n","",abstext, ignore.case = FALSE)
+abstext <- gsub("\t","",abstext, ignore.case = FALSE)
+abstext <- gsub("\r","",abstext, ignore.case = FALSE)
+abstext <- trimws(abstext)
+
+out <- cbind(titles, abstext)
+colnames(out) <- c("Article Title",
+                "Article Abstract")
+
+out <- out[!(is.na(out[,2])),]
+out <- out[!(out[,2]==""),]
+
+```
+
+``` {r AER_kable, results = 'asis', echo = FALSE}
+
+kable(out, caption = "American Economic Review")
+
+```
