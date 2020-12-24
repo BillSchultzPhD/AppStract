@@ -24,7 +24,7 @@ library(rmdformats)
 
 ```{r pickjournals, include=FALSE}
 
-journals <- c( "CL" , "CB" , "JPR" , "AER" )
+journals <- c( "APSR" , "AER" , "CL" , "ASR" )
 source("FILEPATH/library.R")
 
 ```
