@@ -94,7 +94,7 @@ out <- out[!(out[,2]==""),]
 
 ``` {r run, include=FALSE}
 
-source("C:/Users/schul/Desktop/keep up with research/keep up with research/library.R")
+source("FILEPATH/library.R")
 
 out <- as.list(matrix(NA, 1, 2))
 
