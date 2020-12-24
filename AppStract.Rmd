@@ -78,7 +78,7 @@ abstext <- gsub("Section:ChooseTop of page <<","",abstext)
 abstext <- gsub("\n","",abstext)
 abstext <- gsub("\t","",abstext, ignore.case = FALSE)
 abstext <- gsub("\r","",abstext, ignore.case = FALSE)
-abstext <- gsub("$","",abstext)
+abstext <- gsub("\\$","",abstext)
 abstext <- gsub("  ","",abstext)
 abstext <- base::trimws(abstext)
 
