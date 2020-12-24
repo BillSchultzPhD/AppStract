@@ -1,0 +1,127 @@
+---
+title: "AppStract"
+date: "December 21 2020"
+output: rmdformats::readthedown
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+``` {r packages, include = FALSE }
+  
+#install.packages("Rcrawler")
+library(Rcrawler)
+#install.packages("tidyverse")
+library(tidyverse)
+#install.packages("kableExtra)
+library(kableExtra)
+#install.packages("rmdformats")
+library(rmdformats)
+
+```
+
+```{r pickjournals, include=FALSE}
+
+journals <- c( "CL" , "CB" , "JPR" , "AER" )
+
+```
+
+``` {r appstract, include=FALSE}
+
+AppStract <- function(input) {
+
+liblist <- input
+
+internal_links <- Rcrawler::LinkExtractor(url = liblist[[1]])$InternalLinks
+internal_links <- internal_links[grepl(liblist[[2]], internal_links)]
+
+if ( !( liblist[[3]] == "NULL") ) {
+  
+  j <- 1
+  for (j in 1:length(liblist[[3]])) {
+  internal_links <- internal_links[!(grepl(liblist[[3]][j], internal_links ))]
+  }
+
+}
+
+titles <- internal_links %>%
+  
+  purrr::map(~{
+    
+    invisible( unlist( ContentScraper(Url = .x, CssPatterns = liblist[[4]] )) )
+    
+  }) %>% 
+  
+  unlist()
+
+abstext <- internal_links %>%
+  
+  purrr::map(~{
+    
+    unlist( ContentScraper( Url = .x, CssPatterns = liblist[[5]] ) )
+    
+  }) %>% 
+  
+  unlist()
+
+titles <- gsub("\n","",titles)
+titles <- base::trimws(titles)
+titles <- gsub("Review Essay","",titles, ignore.case=FALSE)
+titles <- gsub("Scholarly Dialogue","",titles, ignore.case=FALSE)
+titles <- gsub("Short Article","",titles, ignore.case=FALSE)
+
+abstext <- gsub("Abstract","",abstext)
+abstext <- gsub("Section:ChooseTop of page <<","",abstext)
+abstext <- gsub("\n","",abstext)
+abstext <- gsub("\t","",abstext, ignore.case = FALSE)
+abstext <- gsub("\r","",abstext, ignore.case = FALSE)
+abstext <- gsub("$","",abstext)
+abstext <- gsub("  ","",abstext)
+abstext <- base::trimws(abstext)
+
+out <- cbind(titles, abstext)
+colnames(out) <- c("Article Title",
+                "Article Abstract")
+
+out <- out[!(is.na(out[,2])),]
+out <- out[!(out[,2]==""),]
+
+}
+
+```
+
+``` {r run, include=FALSE}
+
+source("C:/Users/schul/Desktop/keep up with research/keep up with research/library.R")
+
+out <- as.list(matrix(NA, 1, 2))
+
+i <- 1
+for (i in 1:length(journals)) {
+  
+  out[[paste("t",i,sep="")]] <- AppStract( unlist(l[names(l) %in% journals[i]]) )
+
+}
+
+out <- out[ !(names(out) %in% c("")) ]
+tab <- out
+out <- NULL
+
+```
+
+``` {r out, results = 'asis', echo=FALSE}
+
+i <- 1
+for (i in 1:length(journals)) {
+  
+  cat('#', as.character(unlist(l[names(l) %in% journals[i]])[6]), '\n')
+  
+  print( landscape( kable_styling( kable(tab[[i]] ) ) ) )
+  
+  cat("\n")
+  
+}
+  
+```
