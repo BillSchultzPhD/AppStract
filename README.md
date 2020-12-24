@@ -10,6 +10,8 @@ USING THE TOOL: make sure you've installed all the packages in the "packages" co
 
 ADDING JOURNALS TO THE LIBRARY: You need six things. (1) A url for the "most recent" or "current issue" webpage for the journal. (2) The root url for articles. (3) Character strings that can be used (via regular expressions) to select out entries you don't want (e.g., book reviews). The default is "NULL," meaning no restrictions. (4, 5) CSS selectors to identify the title and abstract from the website's CSS source code. (6) And the journal's name. Finding good CSS selectors is the trickiest part, and requires a little trial and error. Right now, the code only works for journals that have a fixed "current issue" page, but I'll eventually add functionality for other journals.
 
+# Other notes
+
 I've already added options for some well-known journals in political science, economics, environmental research, and sociology. I occasionally add others on my own, but let me know if you have suggestions.
 
 This is still a work in process. I'm sure it could use plenty of fine tuning.
