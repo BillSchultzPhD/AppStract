@@ -25,6 +25,7 @@ library(rmdformats)
 ```{r pickjournals, include=FALSE}
 
 journals <- c( "CL" , "CB" , "JPR" , "AER" )
+source("FILEPATH/library.R")
 
 ```
 
@@ -93,8 +94,6 @@ out <- out[!(out[,2]==""),]
 ```
 
 ``` {r run, include=FALSE}
-
-source("FILEPATH/library.R")
 
 out <- as.list(matrix(NA, 1, 2))
 
