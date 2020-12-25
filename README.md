@@ -1,5 +1,5 @@
 # Overview
-Some R markdown code to webscrape article titles and abstracts from the most recent issue of various academic journals. I was surprised that I couldn't find a tool like this that already exists, so I thought I'd try making one. You can find an example of what the finished result looks like [here](https://billschultzphd.netlify.app/appstract).
+Some R markdown code to webscrape article titles and abstracts from the most recent issue of various academic journals. I was surprised that I couldn't find a tool like this that already exists, so I thought I'd try making one.
 
 The code creates an HTML document (using the "readthedown" markdown theme from the "rmdformats" package) wherever the working directory on your machine is set, with the results for each journal in a separate table. I'm sure that the code itself is not optimal, but it is (or should be?) functional, as long as the HTML/CSS coding for these journal webpages is consistent over time. You may run into some occasional errors due to server timeouts and the like; just try running it again. Processing for each journal takes 30 seconds to a few minutes, so if you try to scrape all or many of the journals it could take some time to finish.
 
